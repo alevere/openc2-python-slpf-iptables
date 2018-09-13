@@ -36,20 +36,21 @@ myusername$ sudo yum install python36.x86_64
 myusername$ sudo ln -s /usr/bin/python3 /usr/bin/python
 ```
 
-Edit or Replace Apache2 config 
+
+Edit or Replace Apache2 config  [httpd.conf](httpd.conf) file, esp. lines 120-173 
 ```
-See [httpd.conf](httpd.conf) file, esp. lines 120-170 
 myusername$ sudo vi /etc/httpd/conf/httpd.conf
 myusername$ sudo service httpd restart
 ```
 
-Optionally configure TLS/SSL
+Optionally configure TLS/SSL and edit ssl.conf
 ```
 myusername$ sudo sudo yum install mod24_ssl.x86_64
 myusername$ sudo openssl req -new -x509 -nodes -out server.crt -keyout server.key
+myusername$ sudo vi /etc/httpd/conf.d/ssl.conf 
 ```
 
-Edit sudoers file
+Edit or Replace Apache2 config  [sudoers](sudoers) file, esp. lines 120-173
 ```
 myusername$ sudo visudo
 ```
