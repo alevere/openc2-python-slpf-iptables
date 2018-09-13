@@ -1,5 +1,5 @@
 # openc2-python-slpf-iptables
-A python/apache implementation of the OpenC2 SLPF that can be ran on an Amazon Linux host
+This is an Apache and Python3 implementation of the OpenC2 SLPF for an Amazon Linux server
 
 ## Getting Started
 
