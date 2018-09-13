@@ -22,8 +22,8 @@ HTTP/1.1 200 OK
 }
 
 ```
-Note that this requests blocks 2.2.2.6, for actual testing use your own IP address.
-Every 30 minutes a cron job runs and it will clear out iptables so that I dont have a bunch of odd rules installed
+Note that this requests blocks the IPv4 address 2.2.2.6; but for actual testing use your own IP address.
+Every 30 minutes a cron job runs and it will clear out iptables so that I dont end up with a bunch of odd rules installed
 ### Prerequisites
 
 An EC-2 host running Amazon Linux AMI along with the public IP address where it can be reached.
