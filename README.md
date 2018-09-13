@@ -116,7 +116,7 @@ Test that you can connect remotely
 curl -vvv http://[insert IP or name here]
 ```
 
-Check to see what iptables currently has configured, it is allowing all in my example below
+Check to see what iptables currently has configured. In the response below it is allowing all packets.
 ```
 sudo iptables --list
 ```
