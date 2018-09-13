@@ -18,46 +18,46 @@ HTTPS,TCP,443,0.0.0.0/0,ssl
 
 Log into the EC2 host via SSH and update packages
 ```
-myusername$ ssh -i awskey.key ec2-user@ec2-34-220-x-y.us-west-2.compute.amazonaws.com
-[ec2-user@ip-172-31-x-y html]$ sudo yum update
+ssh -i awskey.key ec2-user@ec2-34-220-x-y.us-west-2.compute.amazonaws.com
+sudo yum update
 ```
 
 Install and Start Apache2
 ```
-myusername$ sudo yum install httpd24.x86_64
-myusername$ sudo chkconfig httpd on
-myusername$ sudo service httpd start
+sudo yum install httpd24.x86_64
+sudo chkconfig httpd on
+sudo service httpd start
 ```
 
 Install Python3
 
 ```
-myusername$ sudo yum install python36.x86_64
-myusername$ sudo ln -s /usr/bin/python3 /usr/bin/python
+sudo yum install python36.x86_64
+sudo ln -s /usr/bin/python3 /usr/bin/python
 ```
 
 
 Edit or Replace Apache2 config  [httpd.conf](httpd.conf) file, esp. lines 120-173 
 ```
-myusername$ sudo vi /etc/httpd/conf/httpd.conf
-myusername$ sudo service httpd restart
+sudo vi /etc/httpd/conf/httpd.conf
+sudo service httpd restart
 ```
 
 Optionally configure TLS/SSL and edit ssl.conf
 ```
-myusername$ sudo sudo yum install mod24_ssl.x86_64
-myusername$ sudo openssl req -new -x509 -nodes -out server.crt -keyout server.key
-myusername$ sudo vi /etc/httpd/conf.d/ssl.conf 
+sudo sudo yum install mod24_ssl.x86_64
+sudo openssl req -new -x509 -nodes -out server.crt -keyout server.key
+sudo vi /etc/httpd/conf.d/ssl.conf 
 ```
 
 Edit or Replace Apache2 config  [sudoers](sudoers) file, esp. line 92
 ```
-myusername$ sudo visudo
+sudo visudo
 ```
 
 If SELinux is enforcing, take care of that
 ```
-myusername$ exercise for the reader
+exercise left for the reader
 ```
 ## Running the tests
 
