@@ -37,9 +37,10 @@ myusername$ sudo ln -s /usr/bin/python3 /usr/bin/python
 ```
 
 Edit or Replace Apache2 config 
-See httpd.conf file, esp. lines 120-170
 ```
+See [httpd.conf](httpd.conf) file, esp. lines 120-170 
 myusername$ sudo vi /etc/httpd/conf/httpd.conf
+myusername$ sudo service httpd restart
 ```
 
 Optionally configure TLS/SSL
@@ -51,11 +52,6 @@ myusername$ sudo openssl req -new -x509 -nodes -out server.crt -keyout server.ke
 Edit sudoers file
 ```
 myusername$ sudo visudo
-```
-
-See httpd.conf file, esp. lines 120-170
-```
-myusername$ sudo vi /etc/httpd/conf/httpd.conf
 ```
 
 ## Running the tests
