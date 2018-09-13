@@ -9,7 +9,6 @@ An EC-2 host running Amazon-Linux along with the public address where it can be 
 
 ### Installing
 Configure EC2 Security group
-
 ```
 Type,Protocol,Port Range, Source, Description
 HTTP,TCP,80,0.0.0.0/0,web
@@ -18,13 +17,46 @@ HTTPS,TCP,443,0.0.0.0/0,ssl
 ```
 
 Log into the EC2 host via SSH and update packages
-
 ```
 myusername$ ssh -i awskey.key ec2-user@ec2-34-220-x-y.us-west-2.compute.amazonaws.com
 [ec2-user@ip-172-31-x-y html]$ sudo yum update
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+Install and Start Apache2
+```
+myusername$ sudo yum install httpd24.x86_64
+myusername$ sudo chkconfig httpd on
+myusername$ sudo service httpd start
+```
+
+Install Python3
+
+```
+myusername$ sudo yum install python36.x86_64
+myusername$ sudo ln -s /usr/bin/python3 /usr/bin/python
+```
+
+Edit or Replace Apache2 config 
+See httpd.conf file, esp. lines 120-170
+```
+myusername$ sudo vi /etc/httpd/conf/httpd.conf
+```
+
+Optionally configure TLS/SSL
+```
+myusername$ sudo sudo yum install mod24_ssl.x86_64
+myusername$ sudo openssl req -new -x509 -nodes -out server.crt -keyout server.key
+```
+
+Edit sudoers file
+```
+myusername$ sudo visudo
+```
+
+See httpd.conf file, esp. lines 120-170
+```
+myusername$ sudo vi /etc/httpd/conf/httpd.conf
+```
 
 ## Running the tests
 
