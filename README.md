@@ -1,11 +1,11 @@
 # openc2-python-slpf-iptables
-This is an Apache and Python3 implementation of the OpenC2 SLPF for an Amazon Linux server
+This is an Apache and Python3 implementation of the OpenC2 SLPF for an Amazon Linux AMI server
 
 ## Getting Started
 
 ### Prerequisites
 
-An EC-2 host running Amazon-Linux along with the public address where it can be reached.
+An EC-2 host running Amazon Linux AMI along with the public IP address where it can be reached.
 
 ### Installing
 Configure EC2 Security group
