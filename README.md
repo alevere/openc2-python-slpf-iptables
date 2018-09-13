@@ -50,11 +50,15 @@ myusername$ sudo openssl req -new -x509 -nodes -out server.crt -keyout server.ke
 myusername$ sudo vi /etc/httpd/conf.d/ssl.conf 
 ```
 
-Edit or Replace Apache2 config  [sudoers](sudoers) file, esp. lines 120-173
+Edit or Replace Apache2 config  [sudoers](sudoers) file, esp. line 92
 ```
 myusername$ sudo visudo
 ```
 
+If SELinux is enforcing, take care of that
+```
+myusername$ exercise for the reader
+```
 ## Running the tests
 
 Explain how to run the automated tests for this system
