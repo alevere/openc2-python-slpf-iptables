@@ -1,8 +1,29 @@
 # openc2-python-slpf-iptables
-This is an Apache and Python3 implementation of the OpenC2 SLPF for an Amazon Linux AMI server
+This is an Apache and Python3 implementation of the OpenC2 SLPF for an Amazon Linux AMI server.
+For more information on OpenC2 see https://www.oasis-open.org/committees/openc2
 
 ## Getting Started
+You can test my already running implementation in AWS EC2 by making the following request
+```
+curl -k -vvv https://ec2-34-220-41-4.us-west-2.compute.amazonaws.com/openc2 -H 'X-Correlation-ID: shq5x2dmgayf' -H 'Content-Type: application/openc2+json;version=1.0' -d '{"id":"0bc6dc48-0eaa-40a8-802f-0acb73e3fa88","action": "deny","target": {"ip_connection": {"src_addr": "2.2.2.6"}},"actuator": {"slpf": {"actuator_id": "1"}}}'
+```
+You should get the following response
+```
+HTTP/1.1 200 OK
+< Date: Thu, 13 Sep 2018 17:51:11 GMT
+< Server: Apache/2.4.34 (Amazon) OpenSSL/1.0.2k-fips
+< X-Correlation-ID: shq5x2dmgayf
+< Transfer-Encoding: chunked
+< Content-Type: application/openc2+json;version=1.0
+< 
+{
+    "status": 200,
+    "status_text": "ok"
+}
 
+```
+Note that this requests blocks 2.2.2.6, you could test with your own IP address.
+Every 30 minutes a cron job runs and it will clear out iptables so that I dont have a bunch of odd rules installed
 ### Prerequisites
 
 An EC-2 host running Amazon Linux AMI along with the public IP address where it can be reached.
@@ -59,29 +80,19 @@ If SELinux is enforcing, take care of that
 ```
 exercise left for the reader
 ```
+
+Place [openc2](openc2) file in /var/www/html or other documentroot and set appropriate permissions for apache user
+```
+cd /var/www/html
+sudo vi openc2
+```
 ## Running the tests
 
 Explain how to run the automated tests for this system
 
-### Break down into end to end tests
+## Comments
 
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
+One should perform input/output sanitization, esp. when working with untrusted input
 
 ## Built With
 
@@ -100,4 +111,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 * Joe Brule
-* All partipants of the Oasis OpenC2 Actuator Subcommittee
+* All partipants of the OASIS OpenC2 Actuator Subcommittee
