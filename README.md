@@ -88,11 +88,82 @@ sudo vi openc2
 ```
 ## Running the tests
 
-Explain how to run the automated tests for this system
+First, make sure the webserver is running and listening on 80 and 443 if that is what you configured
+```
+sudo ps -ef | grep -i http
+```
+```
+root     16877     1  0 15:31 ?        00:00:00 /usr/sbin/httpd
+apache   16879 16877  0 15:31 ?        00:00:01 /usr/sbin/httpd
+apache   16880 16877  0 15:31 ?        00:00:01 /usr/sbin/httpd
+apache   16881 16877  0 15:31 ?        00:00:01 /usr/sbin/httpd
+apache   16882 16877  0 15:31 ?        00:00:01 /usr/sbin/httpd
+apache   16883 16877  0 15:31 ?        00:00:01 /usr/sbin/httpd
+apache   17025 16877  0 16:33 ?        00:00:00 /usr/sbin/httpd
+ec2-user 17247 17124  0 18:00 pts/0    00:00:00 grep --color=auto -i http
+```
+and
+```
+sudo netstat -tulpn | grep -i http
+```
+```
+tcp        0      0 :::80                       :::*                        LISTEN      16877/httpd         
+tcp        0      0 :::443                      :::*                        LISTEN      16877/httpd 
+```
+
+Test that you can connect remotely
+```
+curl -vvv http://[insert IP or name here]
+```
+
+Check to see what iptables currently has configured, it is allowing all in my example below
+```
+sudo iptables --list
+```
+```
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+```
+
+Test that python3 works as expected,
+```
+python /var/www/html/openc2
+```
+This should result in
+```
+HTTP/1.1 500
+Content-Type: application/openc2+json;version=1.0
+
+[
+    "response",
+    {
+        "status": 500,
+        "status_text": "server error"
+    }
+]
+
+Traceback (most recent call last):
+  File "openc2", line 109, in <module>
+    main()
+  File "openc2", line 38, in main
+    request_handler()
+  File "openc2", line 51, in request_handler
+    request=sys.stdin.read()
+  File "openc2", line 44, in handler
+    raise IOError("Couldn't open device!")
+OSError: Couldn't open device!
+```
 
 ## Comments
-
+Presently, this code only blocks the source IP given a properly formatted request via POST
 One should perform input/output sanitization, esp. when working with untrusted input
+I do not recommend using this in production or on a server exposed to the Internet
 
 ## Built With
 
