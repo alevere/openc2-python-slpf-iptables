@@ -182,4 +182,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 * Joe Brule
-* All partipants of the OASIS OpenC2 Actuator Subcommittee
+* All partipants of the OASIS OpenC2 Actuator Profile Subcommittee
