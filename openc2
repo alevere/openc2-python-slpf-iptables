@@ -67,41 +67,60 @@ def request_handler():
       not_parseable()
    else:
       conformance=0
-      execute_iptables("deny",parsed_json.get("target").get("ip_connection").get("src_addr"))
-      server_ok('')
+      sanitize(parsed_json.get("action"),'',parsed_json.get("target").get("ip_connection").get("src_addr"),'')
+      execute_iptables(parsed_json.get("action"),parsed_json.get("target").get("ip_connection").get("src_addr"))
 
 # tell producer something went wrong
 def server_error():
-   print('HTTP/1.1 500')
+   print('Status: 500 Internal Server Error')
    print('Content-Type: application/openc2+json;version=1.0')
    print('')
    print(json.dumps(['response', {'status': (500), 'status_text': 'server error'}], sort_keys=True, indent=4))
    print('')
+   exit()
 
 # tell producer we could not interpret request
 def not_parseable():
-   print('HTTP/1.1 400')
+   print('Status: 400 Bad Request')
    print('Content-Type: application/openc2+json;version=1.0')
    print('')
    print(json.dumps(['response', {'status': (400), 'status_text': 'unable to parse request'}], sort_keys=True, indent=4))
    print('')
+   exit()
 
 # tell producer things were ok
-def server_ok(status_text):
+def server_ok(status_text_resp):
    print('Content-Type: application/openc2+json;version=1.0')
    print('')
-   print(json.dumps({'status': (200), 'status_text': 'ok'}, sort_keys=True, indent=4))
+   print(json.dumps({'status': (200), 'status_text': status_text_resp}, sort_keys=True, indent=4))
    print('')
 
-# command to run iptables
-# needs a lot of work, somewhere untrusted input validation needs to occur
-# presently only supports denying a source IP 
+# function to sanitize untrusted input
+def sanitize(action,protocol,source,destination):
+   if len(action)>9:
+      not_parseable()
+   elif len(protocol)>6:
+      not_parseable()
+   elif len(source)>12:
+      not_parseable()
+   elif len(destination)>12:
+      not_parseable()
+   else:
+      sanitized=1
+
+# function to run iptables
+# presently only supports denying or allowing a source IP 
 def execute_iptables(action,source):
    if action=="deny":
       action_cli="DROP"
-   # iptables command to review source IP and drop it if it is a match
+   elif action=="allow":
+      action_cli="ACCEPT"
+   else:
+      server_error()
+   # iptables command to review source IP and either allow or deny it
    command_line_args=f"/sbin/iptables --append INPUT --source {source} --jump {action_cli}"
    result=subprocess.run(['sudo','/sbin/iptables','--append','INPUT','--source',source,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+   server_ok('success')
    #server_ok(result.stdout)
    #server_ok(result.stderr)
 
