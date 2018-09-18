@@ -43,7 +43,8 @@ def handler(signum, frame):
    server_error(); 
    raise IOError("Couldn't open device!")
 
-#function to handle GET, POST, cli request and to take some action
+#function to handle GET, POST, cli request and make calls to other functions to execute commands
+#figure out exactly what we want this function to do as far as parsing
 def request_handler():
    conformance=0
    openc2_actions=['query', 'deny', 'allow', 'update', 'delete']
@@ -67,8 +68,12 @@ def request_handler():
       not_parseable()
    else:
       conformance=0
-      sanitize(parsed_json.get("action"),'',parsed_json.get("target").get("ip_connection").get("src_addr"),'')
-      execute_iptables(parsed_json.get("action"),parsed_json.get("target").get("ip_connection").get("src_addr"))
+      if parsed_json.get("action")==openc2_actions[0]:
+         if openc2_targets[3] in parsed_json.get("target"):
+            server_ok('success','pairs supported')
+      else:
+         sanitize(parsed_json.get("action"),'',parsed_json.get("target").get("ip_connection").get("src_addr"),'')
+         execute_iptables(parsed_json.get("action"),parsed_json.get("target").get("ip_connection").get("src_addr"))
 
 # tell producer something went wrong
 def server_error():
@@ -89,10 +94,13 @@ def not_parseable():
    exit()
 
 # tell producer things were ok
-def server_ok(status_text_resp):
+def server_ok(status_text_resp, resultant):
    print('Content-Type: application/openc2+json;version=1.0')
    print('')
-   print(json.dumps({'status': (200), 'status_text': status_text_resp}, sort_keys=True, indent=4))
+   if len(resultant)>4:
+      print(json.dumps({'status': (200), 'status_text': status_text_resp, 'results':{'pairs': [['allow', ['ip_connection']], ['deny', ['ip_connection']], ['query', ['openc2']]]}}, sort_keys=True, indent=4))
+   else:
+      print(json.dumps({'status': (200), 'status_text': status_text_resp}, sort_keys=True, indent=4))
    print('')
 
 # function to sanitize untrusted input
@@ -101,9 +109,9 @@ def sanitize(action,protocol,source,destination):
       not_parseable()
    elif len(protocol)>6:
       not_parseable()
-   elif len(source)>12:
+   elif len(source)>20:
       not_parseable()
-   elif len(destination)>12:
+   elif len(destination)>20:
       not_parseable()
    else:
       sanitized=1
@@ -120,7 +128,7 @@ def execute_iptables(action,source):
    # iptables command to review source IP and either allow or deny it
    command_line_args=f"/sbin/iptables --append INPUT --source {source} --jump {action_cli}"
    result=subprocess.run(['sudo','/sbin/iptables','--append','INPUT','--source',source,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-   server_ok('success')
+   server_ok('success','')
    #server_ok(result.stdout)
    #server_ok(result.stderr)
 
