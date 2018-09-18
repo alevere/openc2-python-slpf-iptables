@@ -161,7 +161,7 @@ OSError: Couldn't open device!
 ```
 
 ## Comments
-Presently, this code only blocks the source IP given a properly formatted request via POST
+Presently, this code only allows/blocks the source IP given a properly formatted request via POST and responds to some query commands.
 One should perform input/output sanitization, esp. when working with untrusted input
 I do not recommend using this in production or on a server exposed to the Internet
 
