@@ -1,5 +1,5 @@
 # openc2-python-slpf-iptables
-This is an Apache and Python3 implementation of the OpenC2 SLPF for an Amazon Linux AMI server.
+This is an Apache and Python3 implementation of the OpenC2 SLPF Working Draft 4 for an Amazon Linux AMI server.
 For more information on OpenC2 see https://www.oasis-open.org/committees/openc2
 
 ## Getting Started
