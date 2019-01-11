@@ -2,6 +2,9 @@
 This is an Apache and Python3 implementation of the OpenC2 SLPF Working Draft 4 for an Amazon Linux AMI server.
 For more information on OpenC2 see https://www.oasis-open.org/committees/openc2
 
+## Overview
+[ client/producer] ----HTTPS----->[server/consumer/actuator]
+
 ## Getting Started
 You can test my already running implementation in AWS EC2 by making the following request
 ```
