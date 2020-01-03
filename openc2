@@ -48,7 +48,7 @@ def handler(signum, frame):
 def request_handler():
    conformance=0
    openc2_actions=['query', 'deny', 'allow', 'update', 'delete']
-   openc2_targets=['file', 'ip_addr', 'ip_connection', 'openc2', 'slpf']
+   openc2_targets=['file', 'ipv4_net', 'ipv6_net', 'ipv4_connection', 'ipv6_connection', 'features', 'slpf:rulenumber']
    request=sys.stdin.read()
    parsed_json = json.loads(request)
    #do we have an actions var
@@ -69,7 +69,7 @@ def request_handler():
    else:
       conformance=0
       if parsed_json.get("action")==openc2_actions[0]:
-         if openc2_targets[3] in parsed_json.get("target"):
+         if openc2_targets[5] in parsed_json.get("target"):
             server_ok('success','pairs supported')
       else:
          sanitize(parsed_json.get("action"),'',parsed_json.get("target").get("ip_connection").get("src_addr"),'')
@@ -98,7 +98,7 @@ def server_ok(status_text_resp, resultant):
    print('Content-Type: application/openc2+json;version=1.0')
    print('')
    if len(resultant)>4:
-      print(json.dumps({'status': (200), 'status_text': status_text_resp, 'results':{'pairs': [['allow', ['ip_connection']], ['deny', ['ip_connection']], ['query', ['openc2']]]}}, sort_keys=True, indent=4))
+      print(json.dumps({'status': (200), 'status_text': status_text_resp, 'results':{'versions': [1.0], 'profiles': ['slpf']}}, sort_keys=True, indent=4))
    else:
       print(json.dumps({'status': (200), 'status_text': status_text_resp}, sort_keys=True, indent=4))
    print('')
@@ -123,6 +123,8 @@ def execute_iptables(action,source):
       action_cli="DROP"
    elif action=="allow":
       action_cli="ACCEPT"
+   elif action=="delete":
+      action_cli="-D"
    else:
       server_error()
    # iptables command to review source IP and either allow or deny it
