@@ -78,7 +78,7 @@ def request_handler():
 # tell producer something went wrong
 def server_error():
    print('Status: 500 Internal Server Error')
-   print('Content-Type: application/openc2+json;version=1.0')
+   print('Content-Type: application/openc2-rsp+json;version=1.0')
    print('')
    print(json.dumps(['response', {'status': (500), 'status_text': 'server error'}], sort_keys=True, indent=4))
    print('')
@@ -87,7 +87,7 @@ def server_error():
 # tell producer we could not interpret request
 def not_parseable():
    print('Status: 400 Bad Request')
-   print('Content-Type: application/openc2+json;version=1.0')
+   print('Content-Type: application/openc2-rsp+json;version=1.0')
    print('')
    print(json.dumps(['response', {'status': (400), 'status_text': 'unable to parse request'}], sort_keys=True, indent=4))
    print('')
@@ -95,7 +95,7 @@ def not_parseable():
 
 # tell producer things were ok
 def server_ok(status_text_resp, resultant):
-   print('Content-Type: application/openc2+json;version=1.0')
+   print('Content-Type: application/openc2-rsp+json;version=1.0')
    print('')
    if len(resultant)>4:
       print(json.dumps({'status': (200), 'status_text': status_text_resp, 'results':{'versions': [1.0], 'profiles': ['slpf']}}, sort_keys=True, indent=4))
