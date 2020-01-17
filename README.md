@@ -47,7 +47,7 @@ sudo yum update
 
 Install and Start Apache2
 ```
-sudo yum install httpd24.x86_64
+sudo yum install httpd.x86_64
 sudo chkconfig httpd on
 sudo service httpd start
 ```
