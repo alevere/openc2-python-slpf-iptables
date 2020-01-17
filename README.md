@@ -68,8 +68,7 @@ sudo systemctl restart httpd.service
 Optionally configure TLS/SSL and edit ssl.conf
 ```
 sudo yum install mod_ssl.x86_64
-sudo openssl req -new -x509 -nodes -out server.crt -keyout server.key
-sudo vi /etc/httpd/conf.d/ssl.conf 
+sudo openssl req -new -x509 -nodes -out /etc/pki/tls/certs/localhost.crt -keyout /etc/pki/tls/private/localhost.key
 ```
 
 Edit or Replace Apache2 config  [sudoers](sudoers) file, esp. line 92
