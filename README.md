@@ -59,10 +59,10 @@ sudo yum install python3.x86_64
 ```
 
 
-Edit or Replace Apache2 config  [httpd.conf](httpd.conf) file, esp. lines 120-173 
+Edit or Replace Apache2 config  [httpd.conf](httpd.conf) file, especially around lines 160 pertaining to mod_headers 
 ```
 sudo vi /etc/httpd/conf/httpd.conf
-sudo service httpd restart
+sudo systemctl restart httpd.service
 ```
 
 Optionally configure TLS/SSL and edit ssl.conf
