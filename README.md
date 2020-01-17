@@ -8,20 +8,25 @@ For more information on OpenC2 see https://www.oasis-open.org/committees/openc2
 ## Getting Started
 You can test my already running implementation in AWS EC2 by making the following request
 ```
-curl -k -vvv https://ec2-54-235-13-229.compute-1.amazonaws.com/openc2 -H 'X-Correlation-ID: shq5x2dmgayf' -H 'Content-Type: application/openc2+json;version=1.0' -d '{"id":"0bc6dc48-0eaa-40a8-802f-0acb73e3fa88","action": "deny","target": {"ip_connection": {"src_addr": "2.2.2.6"}},"actuator": {"slpf": {"actuator_id": "1"}}}'
+curl -k -vvv https://ec2-54-235-13-229.compute-1.amazonaws.com/openc2 -H 'X-Request-ID: 0bc6dc48-0eaa-42a8-802f-0acbb3e3fa00' -H 'Content-Type: application/openc2-cmd+json;version=1.0' -d '{"action": "deny","target": {"ipv4_net":"152.2.0.0/17"},"args": {"response_requested": "complete","slpf": {"direction": "ingress"}},"actuator": {"slpf": {}}}'
 ```
 You should get the following response
 ```
 HTTP/1.1 200 OK
 < Date: Thu, 13 Sep 2018 17:51:11 GMT
 < Server: Apache/2.4.34 (Amazon) OpenSSL/1.0.2k-fips
-< X-Correlation-ID: shq5x2dmgayf
+< X-Request-ID: 0bc6dc48-0eaa-42a8-802f-0acbb3e3fa00
 < Transfer-Encoding: chunked
-< Content-Type: application/openc2+json;version=1.0
+< Content-Type: application/openc2-rsp+json;version=1.0
 < 
 {
     "status": 200,
     "status_text": "ok"
+    "results": {
+    "slpf": {
+      "rule_number": 1234
+    }
+  }
 }
 
 ```
