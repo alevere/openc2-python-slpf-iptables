@@ -1,5 +1,5 @@
 # openc2-python-slpf-iptables
-This is an Apache and Python3 implementation of the OpenC2 SLPF Working Draft 4 for an Amazon Linux AMI server.
+This is an Apache and Python3 implementation of the OpenC2 SLPF Committee Specification version 1.0 for an Amazon Linux 2 AMI web server.
 For more information on OpenC2 see https://www.oasis-open.org/committees/openc2
 
 ## Overview
@@ -8,7 +8,7 @@ For more information on OpenC2 see https://www.oasis-open.org/committees/openc2
 ## Getting Started
 You can test my already running implementation in AWS EC2 by making the following request
 ```
-curl -k -vvv https://ec2-34-220-41-4.us-west-2.compute.amazonaws.com/openc2 -H 'X-Correlation-ID: shq5x2dmgayf' -H 'Content-Type: application/openc2+json;version=1.0' -d '{"id":"0bc6dc48-0eaa-40a8-802f-0acb73e3fa88","action": "deny","target": {"ip_connection": {"src_addr": "2.2.2.6"}},"actuator": {"slpf": {"actuator_id": "1"}}}'
+curl -k -vvv https://ec2-54-235-13-229.compute-1.amazonaws.com/openc2 -H 'X-Correlation-ID: shq5x2dmgayf' -H 'Content-Type: application/openc2+json;version=1.0' -d '{"id":"0bc6dc48-0eaa-40a8-802f-0acb73e3fa88","action": "deny","target": {"ip_connection": {"src_addr": "2.2.2.6"}},"actuator": {"slpf": {"actuator_id": "1"}}}'
 ```
 You should get the following response
 ```
@@ -29,13 +29,12 @@ Note that this requests blocks the IPv4 address 2.2.2.6; but for actual testing 
 Every 30 minutes a cron job runs and it will clear out iptables so that I dont end up with a bunch of odd rules installed
 ### Prerequisites
 
-An EC-2 host running Amazon Linux AMI along with the public IP address where it can be reached.
+An EC2 host running Amazon Linux 2 AMI along with the public IP address where it can be reached.
 
 ### Installing
-Configure EC2 Security group
+Configure the following EC2 Security Group
 ```
 Type,Protocol,Port Range, Source, Description
-HTTP,TCP,80,0.0.0.0/0,web
 SSH,TCP,22,0.0.0.0/0,remote access
 HTTPS,TCP,443,0.0.0.0/0,ssl
 ```
