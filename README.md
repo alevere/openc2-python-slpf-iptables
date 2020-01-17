@@ -81,10 +81,14 @@ If SELinux is enforcing, take care of that
 exercise left for the reader
 ```
 
-Place [openc2](openc2) file in /var/www/html or other documentroot and set appropriate permissions for apache user
+Place [openc2](openc2) file in /var/www/html (or other Document Root) and set appropriate permissions for apache user
 ```
 cd /var/www/html
 sudo vi openc2
+//paste in file contents from repo
+sudo chgrp apache openc2
+sudo chmod 750
+sudo systemctl restart httpd.service
 ```
 ## Running the tests
 
