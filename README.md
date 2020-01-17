@@ -48,15 +48,14 @@ sudo yum update
 Install and Start Apache2
 ```
 sudo yum install httpd.x86_64
-sudo chkconfig httpd on
-sudo service httpd start
+sudo systemctl enable httpd.service
+sudo systemctl start httpd.service
 ```
 
 Install Python3
 
 ```
-sudo yum install python36.x86_64
-sudo ln -s /usr/bin/python3 /usr/bin/python
+sudo yum install python3.x86_64
 ```
 
 
