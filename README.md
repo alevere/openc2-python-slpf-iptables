@@ -67,7 +67,7 @@ sudo systemctl restart httpd.service
 
 Optionally configure TLS/SSL and edit ssl.conf
 ```
-sudo sudo yum install mod24_ssl.x86_64
+sudo yum install mod_ssl.x86_64
 sudo openssl req -new -x509 -nodes -out server.crt -keyout server.key
 sudo vi /etc/httpd/conf.d/ssl.conf 
 ```
