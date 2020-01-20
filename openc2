@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3 
 #
 #  The MIT License (MIT)
 #
@@ -49,6 +49,8 @@ def request_handler():
    conformance=0
    openc2_actions=['query', 'deny', 'allow', 'update', 'delete']
    openc2_targets=['file', 'ipv4_net', 'ipv6_net', 'ipv4_connection', 'ipv6_connection', 'features', 'slpf:rulenumber']
+   openc2_query=['versions','profiles','pairs','rate_limit']
+   openc2_query_versions=['1.0']
    request=sys.stdin.read()
    parsed_json = json.loads(request)
    #do we have an actions var
@@ -67,10 +69,40 @@ def request_handler():
    if conformance!=1:
       not_parseable()
    else:
+      # we have a request with an action and a target
       conformance=0
+      # check for query features
+      feature_count=0
+      feature_power=0
+      feature_total=0
       if parsed_json.get("action")==openc2_actions[0]:
          if openc2_targets[5] in parsed_json.get("target"):
-            server_ok('success','pairs supported')
+            for charlie in parsed_json.get("target").get("features"):
+               if charlie==openc2_query[0]:
+                  feature_total=1
+               if charlie==openc2_query[1]:
+                  feature_total=feature_total+2
+               if charlie==openc2_query[2]:
+                  feature_total=feature_total+4
+               if charlie==openc2_query[3]:
+                  feature_total=feature_total+8
+            if feature_total==0:         
+               server_200(json.loads('{"status":200}'))
+            elif feature_total==1:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"]}}'))  
+            elif feature_total==2:
+               server_200(json.loads('{"status":200,"results":{"profiles":["slpf"]}}'))
+            elif feature_total==3:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"],"profiles":["slpf"]}}'))
+            elif feature_total==4:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"]}}'))
+            elif feature_total==5:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"]}}'))
+            elif feature_total==6:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"]}}'))
+            else:
+               not_parseable()
+      # action is either deny, allow, etc
       else:
          sanitize(parsed_json.get("action"),'',parsed_json.get("target").get("ip_connection").get("src_addr"),'')
          execute_iptables(parsed_json.get("action"),parsed_json.get("target").get("ip_connection").get("src_addr"))
@@ -80,7 +112,7 @@ def server_error():
    print('Status: 500 Internal Server Error')
    print('Content-Type: application/openc2-rsp+json;version=1.0')
    print('')
-   print(json.dumps(['response', {'status': (500), 'status_text': 'server error'}], sort_keys=True, indent=4))
+   print(json.dumps({'status': (500), 'status_text': 'server error'}, sort_keys=True, indent=4))
    print('')
    exit()
 
@@ -94,13 +126,23 @@ def not_parseable():
    exit()
 
 # tell producer things were ok
+def server_200(resultant):
+   print('Content-Type: application/openc2-rsp+json;version=1.0')
+   print('')
+   print(json.dumps(resultant, sort_keys=True, indent=4))
+
+# tell producer things were ok
 def server_ok(status_text_resp, resultant):
    print('Content-Type: application/openc2-rsp+json;version=1.0')
    print('')
-   if len(resultant)>4:
-      print(json.dumps({'status': (200), 'status_text': status_text_resp, 'results':{'versions': [1.0], 'profiles': ['slpf']}}, sort_keys=True, indent=4))
+   print(json.dumps(resultant, sort_keys=True, indent=4))
+   if len(resultant)<3:
+      print('')
    else:
-      print(json.dumps({'status': (200), 'status_text': status_text_resp}, sort_keys=True, indent=4))
+      if len(status_text_resp)<2:
+         print(json.dumps({'status': (200)}, sort_keys=True, indent=4))
+      else:
+         print(json.dumps({'status': (200), 'status_text': status_text_resp}, sort_keys=True, indent=4))
    print('')
 
 # function to sanitize untrusted input
