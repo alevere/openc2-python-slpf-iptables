@@ -8,30 +8,41 @@ For more information on OpenC2 see https://www.oasis-open.org/committees/openc2
 ## Getting Started
 You can test my already running implementation in AWS EC2 by making the following request
 ```
-curl -k -vvv https://ec2-54-235-13-229.compute-1.amazonaws.com/openc2 -H 'X-Request-ID: 0bc6dc48-0eaa-42a8-802f-0acbb3e3fa00' -H 'Content-Type: application/openc2-cmd+json;version=1.0' -d '{"action": "deny","target": {"ipv4_net":"152.2.0.0/17"},"args": {"response_requested": "complete","slpf": {"direction": "ingress"}},"actuator": {"slpf": {}}}'
+curl -k -vvv https://ec2-54-235-13-229.compute-1.amazonaws.com/openc2 -H 'X-Request-ID: 0bc6dc48-0eaa-42a8-802f-0acbb3e3fa00' -H 'Content-Type: application/openc2-cmd+json;version=1.0' -d '{"action": "query","target": {"features":["pairs"]}}'
 ```
 You should get the following response
 ```
 HTTP/1.1 200 OK
-< Date: Thu, 13 Sep 2018 17:51:11 GMT
-< Server: Apache/2.4.34 (Amazon) OpenSSL/1.0.2k-fips
-< X-Request-ID: 0bc6dc48-0eaa-42a8-802f-0acbb3e3fa00
-< Transfer-Encoding: chunked
-< Content-Type: application/openc2-rsp+json;version=1.0
-< 
+Date: Sat, 25 Jan 2020 16:48:55 GMT
+Server: Apache/2.4.41 () OpenSSL/1.0.2k-fips
+Upgrade: h2,h2c
+Connection: Upgrade
+X-Request-ID: 0bc6dc48-0eaa-42a8-802f-0acbb3e3fa00
+Cache-Control: no-cache
+Transfer-Encoding: chunked
+Content-Type: application/openc2-rsp+json;version=1.0
+ 
 {
-    "status": 200,
-    "status_text": "ok"
     "results": {
-    "slpf": {
-      "rule_number": 1234
-    }
-  }
+        "pairs": {
+            "allow": [
+                "ipv4_net"
+            ],
+            "deny": [
+                "ipv4_net"
+            ],
+            "query": [
+                "features"
+            ]
+        }
+    },
+    "status": 200
 }
 
 ```
-Note that this requests blocks the IPv4 address 2.2.2.6; but for actual testing use your own IP address.
-Every 30 minutes a cron job runs and it will clear out iptables so that I dont end up with a bunch of odd rules installed
+For allow/deny actions use your own IP address.
+Every 30 minutes a cron job runs and it will clear out iptables so that I dont end up with a bunch of odd rules installed.
+
 ### Prerequisites
 
 An EC2 host running Amazon Linux 2 AMI along with the public IP address where it can be reached.
