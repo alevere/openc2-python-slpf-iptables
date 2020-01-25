@@ -78,14 +78,18 @@ def request_handler():
       if parsed_json.get("action")==openc2_actions[0]:
          if openc2_targets[5] in parsed_json.get("target"):
             for charlie in parsed_json.get("target").get("features"):
-               if charlie==openc2_query[0]:
+               if charlie==0:
+                  feature_total=feature_total
+               elif charlie==openc2_query[0]:
                   feature_total=1
-               if charlie==openc2_query[1]:
+               elif charlie==openc2_query[1]:
                   feature_total=feature_total+2
-               if charlie==openc2_query[2]:
+               elif charlie==openc2_query[2]:
                   feature_total=feature_total+4
-               if charlie==openc2_query[3]:
+               elif charlie==openc2_query[3]:
                   feature_total=feature_total+8
+               else:
+                  not_parseable()
             if feature_total==0:         
                server_200(json.loads('{"status":200}'))
             elif feature_total==1:
@@ -95,11 +99,29 @@ def request_handler():
             elif feature_total==3:
                server_200(json.loads('{"status":200,"results":{"versions":["1.0"],"profiles":["slpf"]}}'))
             elif feature_total==4:
-               server_200(json.loads('{"status":200,"results":{"versions":["1.0"]}}'))
+               server_200(json.loads('{"status":200,"results":{"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]}}}'))
             elif feature_total==5:
-               server_200(json.loads('{"status":200,"results":{"versions":["1.0"]}}'))
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"],"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]}}}'))
             elif feature_total==6:
-               server_200(json.loads('{"status":200,"results":{"versions":["1.0"]}}'))
+               server_200(json.loads('{"status":200,"results":{"profiles":["slpf"],"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]}}}'))
+            elif feature_total==7:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"],"profiles":["slpf"],"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]}}}'))
+            elif feature_total==8:
+               server_200(json.loads('{"status":200,"results":{"rate_limit":10}}'))
+            elif feature_total==9:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"],"rate_limit":10}}'))
+            elif feature_total==10:
+               server_200(json.loads('{"status":200,"results":{"profiles":["slpf"],"rate_limit":10}}'))
+            elif feature_total==11:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"],"profiles":["slpf"],"rate_limit":10}}'))
+            elif feature_total==12:
+               server_200(json.loads('{"status":200,"results":{"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]},"rate_limit":10}}'))
+            elif feature_total==13:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"],"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]},"rate_limit":10}}'))
+            elif feature_total==14:
+               server_200(json.loads('{"status":200,"results":{"profiles":["slpf"],"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]},"rate_limit":10}}'))
+            elif feature_total==15:
+               server_200(json.loads('{"status":200,"results":{"versions":["1.0"],"profiles":["slpf"],"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]},"rate_limit":10}}'))
             else:
                not_parseable()
       # action is either deny, allow, etc
