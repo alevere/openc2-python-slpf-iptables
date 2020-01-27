@@ -41,7 +41,7 @@ Content-Type: application/openc2-rsp+json;version=1.0
 
 ```
 For allow/deny actions use your own IP address.
-At the top of each hour a cron job runs and it will clear out iptables so that I dont end up with a bunch of odd rules installed.
+Every half hour a cron job runs and it will clear out iptables so that I dont end up with a bunch of odd rules installed.
 
 ### Prerequisites
 
