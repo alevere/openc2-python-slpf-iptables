@@ -65,22 +65,25 @@ def request_handler():
       conformance=0
 
    #was no response requested
-   for epsilon in openc2_response_requested:
-      try:
-         resp_req=parsed_json.get("args").get("response_requested")
-         if resp_req==openc2_response_requested[0]:
-            sys.exit()
-         elif resp_req==openc2_response_requested[1]:
-            complete_response=False
-         elif resp_req==openc2_response_requested[2]:
-            complete_response=False
-         elif resp_req==openc2_response_requested[3]:
-            complete_response=True
-         else:
-            not_parseable()
-      except:
-         complete_response=True
+   try:
+      resp_req=parsed_json.get("args").get("response_requested")
+   except:
+      #response_requested was not set, assume requestor desires complete response
+      resp_req=openc2_response_requested[3]
 
+   if resp_req==openc2_response_requested[0]:
+      # no response is requested, so just return a blank 200 OK
+      print('')
+      exit()
+   elif resp_req==openc2_response_requested[1]:
+      complete_response=False
+   elif resp_req==openc2_response_requested[2]:
+      complete_response=False
+   elif resp_req==openc2_response_requested[3]:
+      complete_response=True
+   else:
+      not_parseable()
+   
    #do we have a targets var
    for beta in openc2_targets:
       if beta in parsed_json.get("target"):
@@ -200,8 +203,8 @@ def server_200(complete,resultant):
    if complete==True:
       print(json.dumps(resultant, sort_keys=True, indent=4))
    else:
-      resultant='{"status":200}'
-      print(json.dumps(resultant, sort_keys=True, indent=4))
+      print('{"status":200}')
+   exit()
 
 # function to sanitize untrusted input
 def sanitize(ip_network):
