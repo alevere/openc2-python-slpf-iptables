@@ -51,18 +51,18 @@ def request_handler():
    openc2_targets=['file', 'ipv4_net', 'ipv6_net', 'ipv4_connection', 'ipv6_connection', 'features', 'slpf:rulenumber']
    openc2_query=['versions','profiles','pairs','rate_limit']
    openc2_response_requested=['none','ack','status','complete']
-   complete_response=True
+   complete_response="complete"
    openc2_query_versions=['1.0']
+   the_action=""
+   the_target=""
+
+   #attempt to read request passed from CLI or HTTPd
    request=sys.stdin.read()
-   parsed_json = json.loads(request)
-   #do we have an actions var
-   for alpha in openc2_actions:
-      if alpha==parsed_json['action']:
-         conformance += 1
-   if conformance!=1:
+   #attempt to parse request as JSON
+   try:
+      parsed_json = json.loads(request)
+   except:
       not_parseable()
-   else: 
-      conformance=0
 
    #was no response requested
    try:
@@ -71,26 +71,65 @@ def request_handler():
       #response_requested was not set, assume requestor desires complete response
       resp_req=openc2_response_requested[3]
 
-   if resp_req==openc2_response_requested[0]:
+   if resp_req==None:
+      resp_req=openc2_response_requested[3]
+   elif resp_req==openc2_response_requested[0]:
       # no response is requested, so just return a blank 200 OK
-      print('')
-      exit()
+      complete_response="none"
    elif resp_req==openc2_response_requested[1]:
-      complete_response=False
+      complete_response="status_only"
    elif resp_req==openc2_response_requested[2]:
-      complete_response=False
+      complete_response="status_only"
    elif resp_req==openc2_response_requested[3]:
-      complete_response=True
+      complete_response="complete"
    else:
-      not_parseable()
-   
-   #do we have a targets var
-   for beta in openc2_targets:
-      if beta in parsed_json.get("target"):
-         conformance += 1
-   if conformance!=1:
-      not_parseable()
+      not_parseable('resp_req')
+
+#try to parse the actuator id:
+   queried_asset="myself"
+   try:
+      queried_asset=parsed_json.get("actuator").get("slpf").get("named_group")
+   except:
+      #response_requested was not set, assume requestor desires complete response
+      queried_asset="myself"
+   if (queried_asset=="cloud" or queried_asset=="myself" or queried_asset=="iptables"):
+      queried_asset=="myself"
    else:
+      server_204()
+
+#do we have an actions var
+#   try:
+#      the_action=parsed_json.get("action")
+#   except:
+#      the_action="not specified"
+#   for alpha in openc2_actions:
+#      if alpha==the_action:
+#         conformance += 1
+#   if conformance!=1:
+#      not_parseable()
+
+#do we have a targets var
+   conformance=0
+   tempA=None
+   tempB=None
+   tempC=None
+   try:
+      tempA=parsed_json.get("target").get("ipv4_net")
+   except:
+      conformance=0
+   try:
+      tempB=parsed_json.get("target").get("features")
+   except:
+      conformance=0
+   try:
+      tempC=parsed_json.get("target").get("file")
+   except:
+      conformance=0
+   if (tempA is None) and (tempB is None):
+      not_implemented()
+   else:
+      conformance=1
+   if True:
       # we have a request with an action and a target
       conformance=0
       # check for query features
@@ -111,7 +150,7 @@ def request_handler():
                elif charlie==openc2_query[3]:
                   feature_total=feature_total+8
                else:
-                  not_parseable()
+                  not_parseable('query')
             if feature_total==0:         
                server_200(complete_response,json.loads('{"status":200}'))
             elif feature_total==1:
@@ -145,36 +184,45 @@ def request_handler():
             elif feature_total==15:
                server_200(complete_response,json.loads('{"status":200,"results":{"versions":["1.0"],"profiles":["slpf"],"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]},"rate_limit":10}}'))
             else:
-               not_parseable()
+               not_parseable('query2')
       # action is either deny, allow, update, or delete
       elif parsed_json.get("action")==openc2_actions[3]:
          not_implemented()
       elif parsed_json.get("action")==openc2_actions[4]:
          not_implemented()
-      elif parsed_json.get("action")==openc2_actions[2]:
-         #we are dealing with an allow action
-         not_implemented()
-         sanitize(net)
-         execute_iptables(requested_action,net,directionality)
-      elif parsed_json.get("action")==openc2_actions[1]:
-         #we are dealing with an deny action
+      elif (parsed_json.get("action")==openc2_actions[1]) or (parsed_json.get("action")==openc2_actions[2]):
+         #we are dealing with an allow or deny action
+         directionality="both"
+         net="255.255.255.255.255.255.255"
          try:
-            directionality=parsed_json.get("args").get("slfp").get("direction")
+            directionality=parsed_json.get("args").get("slpf").get("direction")
          except:
             directionality="both"
-         net=parsed_json.get("target").get("ipv4_net")
+         try:
+            net=parsed_json.get("target").get("ipv4_net")
+         except:
+            net="255.255.255.255.255.255.255.255"
          requested_action=parsed_json.get("action")
          sanitize(net)
-         execute_iptables(requested_action,net,directionality,'none')
+         execute_iptables(requested_action,net,directionality,complete_response)
       # action not found, return error
       else:
          server_error()
+
 # tell producer we do not implement or support the request or command
 def not_implemented():
    print('Status: 501 Internal Server Error')
    print('Content-Type: application/openc2-rsp+json;version=1.0')
    print('')
    print(json.dumps({'status': (501), 'status_text': 'Server error, not implemented'}, sort_keys=True, indent=4))
+   print('')
+   exit()
+
+# basically do not respond to producer, no Message/Response sent
+def server_204():
+   print('Status: 204 No Content')
+   print('Content-Type: application/openc2-rsp+json;version=1.0')
+   print('')
    print('')
    exit()
 
@@ -188,11 +236,11 @@ def server_error():
    exit()
 
 # tell producer we could not interpret request
-def not_parseable():
+def not_parseable(comment):
    print('Status: 400 Bad Request')
    print('Content-Type: application/openc2-rsp+json;version=1.0')
    print('')
-   print(json.dumps(['response', {'status': (400), 'status_text': 'unable to parse request'}], sort_keys=True, indent=4))
+   print(json.dumps(['response', {'status': (400), 'status_text': 'unable to parse request near '+comment}], sort_keys=True, indent=4))
    print('')
    exit()
 
@@ -200,8 +248,10 @@ def not_parseable():
 def server_200(complete,resultant):
    print('Content-Type: application/openc2-rsp+json;version=1.0')
    print('')
-   if complete==True:
+   if complete=="complete":
       print(json.dumps(resultant, sort_keys=True, indent=4))
+   elif complete=="none":
+      print('')
    else:
       print('{"status":200}')
    exit()
@@ -238,10 +288,15 @@ def execute_iptables(action,network,direction,expected_response):
       #command_line_args=f"/sbin/iptables --append INPUT --source {source} --jump {action_cli}"
       result=subprocess.run(['sudo','/sbin/iptables','--append','INPUT','--source',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
       result=subprocess.run(['sudo','/sbin/iptables','--append','OUTPUT','--destination',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-      if expected_response=='complete':
-         server_200(complete_response,json.loads('{"status":200,"results":{"versions":["1.0"],"profiles":["slpf"],"rate_limit":10}}'))
-      else:
-         server_200(complete_response,json.loads('{"status":200}'))
+      server_200(expected_response,json.loads('{"status":200, "status_text":"new rule appended"}'))
+   #one command for ingress
+   elif chain=="INPUT":
+      result=subprocess.run(['sudo','/sbin/iptables','--append','INPUT','--source',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      server_200(expected_response,json.loads('{"status":200}'))
+   #must have been an egress request
+   else:
+      result=subprocess.run(['sudo','/sbin/iptables','--append','OUTPUT','--destination',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+   server_200(expected_response,json.loads('{"status":200}'))
 
 if __name__ == "__main__":
     main()
