@@ -1,6 +1,6 @@
 # openc2-python-slpf-iptables
-This is an Apache and Python3 implementation of the OpenC2 SLPF Committee Specification version 1.0 for an Amazon Linux 2 AMI web server.
-For more information on OpenC2 see https://www.oasis-open.org/committees/openc2
+This is a partial Apache and Python3 implementation of the OpenC2 SLPF Committee Specification version 1.1 for an Amazon Linux 2 AMI web server. Successful commands will instantiate stateful or stateless rules via iptables or ip6tables.
+For more information on OpenC2 see openc2.org
 
 ## Overview
 [ client aka producer]  ----HTTPS----->  [server aka consumer/actuator]
