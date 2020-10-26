@@ -153,7 +153,9 @@ target     prot opt source               destination
 
 Test that python3 works as expected,
 ```
-python /var/www/html/openc2
+[ec2-user@ip-172-31-45-108 ~]$ python3 -V
+Python 3.7.9
+[ec2-user@ip-172-31-45-108 ~]$ python3 /var/www/html/openc2
 ```
 This should result in
 ```
