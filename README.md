@@ -8,7 +8,7 @@ For more information on OpenC2 see https://www.oasis-open.org/committees/openc2
 ## Getting Started
 You can test my already running implementation in AWS EC2 by making the following request
 ```
-curl -k -vvv https://ec2-54-235-13-229.compute-1.amazonaws.com/openc2 -H 'X-Request-ID: 0bc6dc48-0eaa-42a8-802f-0acbb3e3fa00' -H 'Content-Type: application/openc2-cmd+json;version=1.0' -d '{"action": "query","target": {"features":["pairs"]}}'
+curl -k -vvv https://ec2-34-207-226-118.compute-1.amazonaws.com/openc2 -H 'X-Request-ID: 0bc6dc48-0eaa-42a8-802f-0acbb3e3fa00' -H 'Content-Type: application/openc2-cmd+json;version=1.0' -d '{"action": "query","target": {"features":["pairs"]}}'
 ```
 You should get the following response
 ```
