@@ -89,7 +89,7 @@ Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin
 ##
 ## Allow root to run any commands anywhere 
 root	ALL=(ALL) 	ALL
-apache  ALL=(ALL)       NOPASSWD:/sbin/iptables *
+apache  ALL=(ALL)       NOPASSWD:/sbin/iptables *, /sbin/ip6tables *
 #ec2-user ALL=(ALL)      NOPASSWD:ALL
 ## Allows members of the 'sys' group to run networking, software, 
 ## service management apps and more.
