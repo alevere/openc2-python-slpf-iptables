@@ -93,9 +93,10 @@ def request_handler():
       #response_requested was not set, assume requestor desires complete response
       queried_asset="myself"
    if (queried_asset=="cloud" or queried_asset=="myself" or queried_asset=="iptables"):
-      queried_asset=="myself"
+      queried_asset="myself"
    else:
-      server_204()
+      queried_asset="myself"
+      #server_204()
 
 #do we have an actions var
 #   try:
