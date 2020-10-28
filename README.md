@@ -1,5 +1,5 @@
 # openc2-python-slpf-iptables
-This is a partial Apache and Python3 implementation of the OpenC2 SLPF Committee Specification version 1.1 for an Amazon Linux 2 AMI web server. Successful commands will instantiate stateful or stateless rules via iptables or ip6tables.
+This is a partial Apache and Python3 implementation of the OpenC2 SLPF Committee Specification version 1.1 for an Amazon Web Services (AWS) Linux 2 AMI or Google Cloud Platform (GCP) Ubuntu web server. Successful commands will instantiate stateful or stateless rules via iptables or ip6tables.
 For more information on OpenC2 see openc2.org
 
 ## Overview
@@ -59,6 +59,7 @@ Log into the EC2 host via SSH and update packages
 ```
 ssh -i awskey.key ec2-user@ec2-34-220-x-y.us-west-2.compute.amazonaws.com
 sudo yum update
+#sudo apt-get update for GCP
 ```
 
 Install and Start Apache2
@@ -66,18 +67,21 @@ Install and Start Apache2
 sudo yum install httpd.x86_64
 sudo systemctl enable httpd.service
 sudo systemctl start httpd.service
+#sudo apt-get install apache2 for GCP
 ```
 
 Install Python3
 
 ```
 sudo yum install python3.x86_64
+#already present on GCP instance
 ```
 
 
 Edit or Replace Apache2 config  [httpd.conf](httpd.conf) file, including lines 117-170 in repo
 ```
 sudo vi /etc/httpd/conf/httpd.conf
+#sudo vi /etc/apache2/apache2.conf for GCP
 sudo systemctl restart httpd.service
 ```
 
