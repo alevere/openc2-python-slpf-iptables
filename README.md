@@ -95,11 +95,13 @@ sudo systemctl restart httpd.service
 Optionally configure TLS/SSL and edit ssl.conf
 ```
 #consider using certbot to obtain a free certificate once you have a domain
+sudo certbot --manual --preferred-challenges dns certonly
+#go and place that txt record in your domain name system
 sudo yum install mod_ssl.x86_64
 sudo openssl req -new -x509 -nodes -out /etc/pki/tls/certs/localhost.crt -keyout /etc/pki/tls/private/localhost.key
 ```
 
-Edit or Replace Apache2 config  [sudoers](sudoers) file, esp. line 92
+Edit or Replace Apache2 config  [sudoers](sudoers) file, esp. line 92, note that Ubuntu uses www-data as the user
 ```
 sudo visudo
 ```
@@ -201,6 +203,7 @@ I do not recommend using this in production or on a server exposed to the Intern
 
 ## Built With
 
+* [GCP](https://cloud.google.com/compute) - The server used
 * [EC2](http://aws.amazon.com/) - The server used
 * [Python3](https://www.python.org/) - Programming language used
 * [Apache2](https://www.apache.org) - The web server used
