@@ -83,6 +83,7 @@ Edit or Replace Apache2 config  [httpd.conf](httpd.conf) file, including lines 1
 sudo vi /etc/httpd/conf/httpd.conf
 #sudo vi /etc/apache2/apache2.conf for GCP
 sudo systemctl restart httpd.service
+#sudo a2enmod rewrite for GCP to enable ReWrite Engine
 ```
 
 Optionally configure TLS/SSL and edit ssl.conf
