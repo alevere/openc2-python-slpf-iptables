@@ -113,6 +113,9 @@ def request_handler():
    tempA=None
    tempB=None
    tempC=None
+   tempD=None
+   tempE=None
+   tempF=None
    try:
       tempA=parsed_json.get("target").get("ipv4_net")
    except:
@@ -125,10 +128,18 @@ def request_handler():
       tempC=parsed_json.get("target").get("file")
    except:
       conformance=0
-   if (tempA is None) and (tempB is None):
-      not_implemented()
-   else:
-      conformance=1
+   try:
+      tempD=parsed_json.get("target").get("ipv4_connection")
+   except:
+      conformance=0
+   try:
+      tempE=parsed_json.get("target").get("ipv6_net")
+   except:
+      conformance=0
+   try:
+      tempF=parsed_json.get("target").get("ipv6_connection")
+   except:
+      conformance=0
    if True:
       # we have a request with an action and a target
       conformance=0
@@ -136,6 +147,7 @@ def request_handler():
       feature_count=0
       feature_power=0
       feature_total=0
+      #check for query action
       if parsed_json.get("action")==openc2_actions[0]:
          if openc2_targets[5] in parsed_json.get("target"):
             for charlie in parsed_json.get("target").get("features"):
@@ -160,7 +172,7 @@ def request_handler():
             elif feature_total==3:
                server_200(complete_response,json.loads('{"status":200,"results":{"versions":["1.0"],"profiles":["slpf"]}}'))
             elif feature_total==4:
-               server_200(complete_response,json.loads('{"status":200,"results":{"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]}}}'))
+               server_200(complete_response,json.loads('{"status":200,"results":{"pairs":{"allow":["ipv4_net","ipv4_connection","ipv6_net","ipv6_connection"],"deny":["ipv4_net","ipv4_connection","ipv6_net","ipv6_connection"],"query":["features"]}}}'))
             elif feature_total==5:
                server_200(complete_response,json.loads('{"status":200,"results":{"versions":["1.0"],"pairs":{"allow":["ipv4_net"],"deny":["ipv4_net"],"query":["features"]}}}'))
             elif feature_total==6:
@@ -190,21 +202,30 @@ def request_handler():
          not_implemented()
       elif parsed_json.get("action")==openc2_actions[4]:
          not_implemented()
+      # action is either allow or deny
       elif (parsed_json.get("action")==openc2_actions[1]) or (parsed_json.get("action")==openc2_actions[2]):
-         #we are dealing with an allow or deny action
-         directionality="both"
-         net="255.255.255.255.255.255.255"
+         # we are dealing with an eny or allow action
+         requested_action=parsed_json.get("action") 
+         directionality="ingress"
+         net=""
          try:
             directionality=parsed_json.get("args").get("slpf").get("direction")
          except:
-            directionality="both"
+            directionality="ingress"
          try:
             net=parsed_json.get("target").get("ipv4_net")
          except:
-            net="255.255.255.255.255.255.255.255"
-         requested_action=parsed_json.get("action")
-         sanitize(net)
-         execute_iptables(requested_action,net,directionality,complete_response)
+            net=""
+         try:
+            netsix=parsed_json.get("target").get("ipv6_net")
+         except:
+            netsix=""
+         if net is None:
+            sanitize(netsix)
+            execute_iptables(requested_action,netsix,directionality,complete_response)
+         else:
+            sanitize(net)
+            execute_iptables(requested_action,net,directionality,complete_response)
       # action not found, return error
       else:
          server_error()
@@ -258,14 +279,17 @@ def server_200(complete,resultant):
 
 # function to sanitize untrusted input
 def sanitize(ip_network):
-   if len(ip_network)>15:
+   semi=ip_network.find(';')
+   if semi>=0:
+      not_parseable()
+   if len(ip_network)>48:
       not_parseable()
    elif len(ip_network)<7:
       not_parseable()
    else:
       sanitized=1
 
-# function to run iptables
+# function to run iptables or ip6tables
 # presently only supports denying or allowing a source IP 
 def execute_iptables(action,network,direction,expected_response):
    if action=="deny":
@@ -281,22 +305,36 @@ def execute_iptables(action,network,direction,expected_response):
    elif direction=="egress":
       chain="OUTPUT"
    else:
-      chain="BOTH"
+      chain="BOTH"  
+   # test for ipv6
+   ipvsix = network.find(':')
    # iptables command to review source IP and either allow or deny it
    if chain=="BOTH":
       #need to execute two iptables commands
       #command_line_args=f"/sbin/iptables --append INPUT --source {source} --jump {action_cli}"
-      result=subprocess.run(['sudo','/sbin/iptables','--append','INPUT','--source',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-      result=subprocess.run(['sudo','/sbin/iptables','--append','OUTPUT','--destination',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-      server_200(expected_response,json.loads('{"status":200, "status_text":"new rule appended"}'))
+      if ipvsix==-1:
+         result=subprocess.run(['sudo','/sbin/iptables','--append','INPUT','--source',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         result=subprocess.run(['sudo','/sbin/iptables','--append','OUTPUT','--destination',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         server_200(expected_response,json.loads('{"status":200, "status_text":"new rule appended"}'))
+      else:
+         result=subprocess.run(['sudo','/sbin/ip6tables','--append','INPUT','--source',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         result=subprocess.run(['sudo','/sbin/ip6tables','--append','OUTPUT','--destination',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         server_200(expected_response,json.loads('{"status":200, "status_text":"new rule appended"}'))
    #one command for ingress
    elif chain=="INPUT":
-      result=subprocess.run(['sudo','/sbin/iptables','--append','INPUT','--source',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-      server_200(expected_response,json.loads('{"status":200}'))
+      if ipvsix==-1:
+         result=subprocess.run(['sudo','/sbin/iptables','--append','INPUT','--source',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         server_200(expected_response,json.loads('{"status":200}'))
+      else:
+         result=subprocess.run(['sudo','/sbin/ip6tables','--append','INPUT','--source',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         server_200(expected_response,json.loads('{"status":200}'))
    #must have been an egress request
    else:
-      result=subprocess.run(['sudo','/sbin/iptables','--append','OUTPUT','--destination',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-   server_200(expected_response,json.loads('{"status":200}'))
-
+      if ipvsix==-1:
+         result=subprocess.run(['sudo','/sbin/iptables','--append','OUTPUT','--destination',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         server_200(expected_response,json.loads('{"status":200}'))
+      else:
+         result=subprocess.run(['sudo','/sbin/ip6tables','--append','OUTPUT','--destination',network,'--jump',action_cli], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         server_200(expected_response,json.loads('{"status":200}'))
 if __name__ == "__main__":
     main()
