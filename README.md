@@ -94,6 +94,7 @@ sudo systemctl restart httpd.service
 
 Optionally configure TLS/SSL and edit ssl.conf
 ```
+#consider using certbot to obtain a free certificate once you have a domain
 sudo yum install mod_ssl.x86_64
 sudo openssl req -new -x509 -nodes -out /etc/pki/tls/certs/localhost.crt -keyout /etc/pki/tls/private/localhost.key
 ```
